@@ -1,0 +1,11 @@
+import time
+
+time_string = "2022-05-18 17:14:33"
+
+t = time.strptime(time_string, "%Y-%m-%d %H:%M:%S")
+# 将时间元组转时间戳(毫秒)
+timestamp = int((time.mktime(t) * 1000))
+print(timestamp)
+
+t2 = time.time()
+print(t2)
