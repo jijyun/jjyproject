@@ -1,0 +1,125 @@
+import time
+import json
+import uuid
+
+timestamp = int(time.time())
+requestID = str(uuid.uuid4())
+
+
+# 前端传来字典，取字符串格式的v转换成int类型（str_info:字典，key_1:key）
+def str_convert_int(str_info, key_1):
+    str1 = str_info[key_1] if key_1 in str_info else ''
+    if str1:
+        str1 = int(str1)
+        str_info[key_1] = str1
+        return str_info
+    else:
+        pass
+    str_info[key_1] = str1
+    return str_info
+
+
+# 前端传来字典，取字符串格式的v转换成float类型传递给第三方
+def str_convert_float(str_info, key_2):
+    str1 = str_info[key_2] if key_2 in str_info else ''
+    if str1:
+        str1 = float(str1)
+        str_info[key_2] = str1
+        return str_info
+    else:
+        pass
+    str_info[key_2] = str1
+    return str_info
+
+
+# 先判断有无，有就int，没有就不返回
+def information(value1):
+    if value1:
+        value1 = int(value1)
+        return value1
+    else:
+        value1 = ''
+        return value1
+
+
+input_data = {{input_data}}
+
+# 字段组报关信息
+customsInfo = input_data.get('customsInfo')
+if customsInfo.get('count'):
+    customsInfo = str_convert_int(customsInfo, 'taxPayMethod')
+else:
+    pass
+# 字段组托寄物信息
+cargoDetails = input_data.get('cargoDetails')
+if cargoDetails.get('count'):
+    cargoDetails = str_convert_int(cargoDetails, 'count')
+else:
+    pass
+# 收寄双方信息
+sender_information = {{input_data.sender_information}}
+sender_information['contactType'] = 1
+recipient_information = {{input_data.recipient_information}}
+recipient_information['contactType'] = 2
+contactInfoList = [sender_information, recipient_information]
+# 快件产品类别
+expressTypeId = {{input_data.expressTypeId}}
+information(expressTypeId)
+# 是否返回签回单运单号
+isSignBack = {{input_data.isSignBack}}
+information(isSignBack)
+# 客户是否统一快件自取
+isOneselfPickup = "{{input_data.isOneselfPickup}}"
+information(isOneselfPickup)
+# 是否返回路由标签
+isReturnRoutelabel = {{input_data.isReturnRoutelabel}}
+information(isReturnRoutelabel)
+# 是否需求分配运单号
+isGenWaybillNo = "{{input_data.isGenWaybillNo}}"
+information(isGenWaybillNo)
+
+Data = {
+    'language': '{{input_data.language}}',
+    'orderId': '{{input_data.orderId}}',
+    'customsInfo': customsInfo,
+    'cargoDetails': [cargoDetails],
+    'contactInfoList': contactInfoList,
+    'expressTypeId': expressTypeId,
+    'sendStartTm': '{{input_data.sendStartTm}}',
+    'isSignBack': isSignBack,
+    'isOneselfPickup': isOneselfPickup,
+    'isReturnRoutelabel': isReturnRoutelabel,
+    'inProcessWaybillNo': '{{input_data.inProcessWaybillNo}}',
+    'isGenWaybillNo': isGenWaybillNo,
+}
+msgData = json.dumps(Data)
+
+# 请求参数选项
+# 如果不需要接口请求，可以删除
+options = {
+    # 生产环境URL
+    # 'url': 'https://bspgw.sf-express.com/std/service',
+    # 测试环境URL
+    'url': '	https://sfapi-sbox.sf-express.com/std/service',
+    'method': 'POST',
+    'headers': {
+        'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    'params': {},
+    'body': {
+        'partnerID': '{{auth_data.partnerID}}',
+        'requestID': requestID,
+        'serviceCode': 'EXP_RECE_CREATE_ORDER',
+        'timestamp': timestamp,
+        'accessToken': '{{auth_data.accessToken}}',
+        'msgData': msgData,
+    },
+}
+
+# 调用请求，返回的结果在response里
+response = jjyHttpRequest(options)
+
+# 需要返回一个对象结构,outPutData 用于存放返回数据
+outPutData = response.json()
+
+outPutData = json.loads(outPutData['apiResultData'])
