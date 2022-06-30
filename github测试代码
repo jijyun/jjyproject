@@ -1,0 +1,39 @@
+inputData = {{input_data}}
+authData = {{auth_data}}
+
+owner = inputData.get('owner')
+repo = inputData.get('repo')
+pull_number = inputData.get('pull_number')
+# 请求参数选项
+# 如果不需要接口请求，可以删除
+options = {
+    'url': f'https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}/commits',
+    'method': 'GET',
+    'headers': {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Accept': 'vnd.github.v3+json',
+    },
+    'params': {},
+    'body': {
+        'per_page': 100,
+        'page': 1
+    },
+}
+
+# 调用请求，返回的结果在response里
+# 如果不需要接口请求，可以删除下面行
+response = jjyHttpRequest(options)
+# 需要返回一个对象结构,outPutData 用于存放返回数据
+outPutData = response.json()
+
+data_list = []
+# 判断是否为空，然后遍历列表，增加新的唯一id，通过唯一ID后台自动判断去重
+if outPutData:
+    for i in outPutData:
+        new_id = i.get('node_id') + i.get('sha')
+        i['new_id'] = new_id
+        data_list.append(i)
+        continue
+    outPutData = data_list
+else:
+    outPutData = []
