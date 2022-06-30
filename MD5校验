@@ -1,0 +1,11 @@
+import hashlib
+import time
+
+sign = '签名拼接组成字符串'
+# MD5签名后字符串
+sign_md5 = hashlib.md5(sign.encode()).hexdigest()
+
+# 时间字符串---20220520133706
+dt = time.strftime("%Y%m%d%H%M%S", time.localtime())
+
+print(dt)
