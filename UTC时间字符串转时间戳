@@ -1,0 +1,7 @@
+from datetime import datetime
+
+created = '2022-05-27T11:01:48Z'
+dt = datetime.strptime(created, '%Y-%m-%dT%H:%M:%SZ')
+t = int(dt.timestamp())
+
+print(t)
